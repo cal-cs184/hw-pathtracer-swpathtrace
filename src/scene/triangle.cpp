@@ -27,12 +27,31 @@ bool Triangle::has_intersection(const Ray &r) const {
   // The difference between this function and the next function is that the next
   // function records the "intersection" while this function only tests whether
   // there is a intersection.
+  Vector3D n = cross((p2-p1), (p3-p1));
+  if (dot(n,r.d)==0){return false;}
+  float t = dot(n,(r.o - p1))/dot(n,r.d);
 
+  Vector3D intersectionPoint = r.o + r.d * t;
 
-  return true;
+  //check if intersectionPoint is in the triangle
+  Vector3D v0 = p2 - p1;
+  Vector3D v1 = p3 - p1;
+  Vector3D v2 = intersectionPoint - p1;
+
+float d00 = dot(v0, v0);
+float d01 = dot(v0, v1);
+float d11 = dot(v1, v1);
+float d20 = dot(v2, v0);
+float d21 = dot(v2, v1);
+
+float denom = d00 * d11 - d01 * d01;
+float v = (d11 * d20 - d01 * d21) / denom;
+float w = (d00 * d21 - d01 * d20) / denom;
+float u =  - v - w;
+
+return v>= 0 && u >= 0 && w >=0;
 
 }
-
 bool Triangle::intersect(const Ray &r, Intersection *isect) const {
   // Part 1, Task 3:
   // implement ray-triangle intersection. When an intersection takes
