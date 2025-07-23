@@ -193,11 +193,25 @@ Ray Camera::generate_ray(double x, double y) const {
   // compute position of the input sensor sample coordinate on the
   // canonical sensor plane one unit away from the pinhole.
   // Note: hFov and vFov are in degrees.
-  //
+  // 
+    //Pseudocode:
+    //We're given the image space coordinates, so we'll lerp between the top and bottom
+    //of the virtual sensor coordinates to find the corresponding location in camera coords.
+    //Then add them, normalize, and transform to world coords
+    //Initialize ray
+    //You should initialize min_t and max_t of a Ray with nclip and fclip, respectively.We will explain this initialization in Task 3.
+    Vector3D cameraXval = (1 - x) * -tan(hFov / 2) + (x)*tan(hFov / 2);
+    Vector3D cameraYval = (1 - y) * -tan(vFov / 2) + (y)*tan(vFov / 2);
+    Vector3D cameraDirection = (cameraXval, cameraYval, -1);
+    Vector3D worldSpaceDirection = c2w * cameraDirection;
+    worldSpaceDirection = sqrt(dot(worldSpaceDirection, worldSpaceDirection)); //normalize
+    Ray finalRay = Ray(pos, worldSpaceDirection);
+    finalRay.min_t = nClip;
+    finalRay.max_t = fClip;
 
 
-  return Ray(pos, Vector3D(0, 0, -1));
-
+  return finalRay;
+   
 }
 
 } // namespace CGL
